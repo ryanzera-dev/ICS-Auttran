@@ -9,8 +9,8 @@
 // @match        https://alexandreturismo.auttran.com/*
 // @grant        GM_addStyle
 // @icon         data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%20fill%3D%22%23CB912F%22%20%2F%3E%3Cpath%20%20d%3D%22m32%2C6c-8.84%2C0-16%2C7.16-16%2C16%2C0%2C2.63.58%2C5.16%2C1.69%2C7.38l13.31%2C26.62h2l13.31-26.62c1.11-2.22%2C1.69-4.75%2C1.69-7.38%2C0-8.84-7.16-16-16-16Zm0%2C26c-5.52%2C0-10-4.48-10-10s4.48-10%2C10-10%2C10%2C4.48%2C10%2C10-4.48%2C10-10%2C10Z%22%20fill%3D%22%23CB912F%22%20%2F%3E%3C%2Fsvg%3E
-// @downloadURL 
-// @updateURL 
+// @downloadURL https://raw.githubusercontent.com/ryanzera-dev/ICS-Auttran/main/C%C3%B3digo
+// @updateURL https://raw.githubusercontent.com/ryanzera-dev/ICS-Auttran/main/C%C3%B3digo
 // ==/UserScript==
 
 (function() {// Marca D'água
