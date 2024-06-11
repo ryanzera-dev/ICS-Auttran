@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ICS - Ryan Script
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  Script de Automação Alexandre Turismo - ICS
 // @author       @ryanzera.dev
 // @license      www.instagram.com/@ryanzera.dev
@@ -288,6 +288,9 @@ function animateArrow() {
   'use strict';
 
   var buttonsContainer;
+  var mainButton = document.createElement('button');
+  var isDragging = false;
+  var offset = { x: 0, y: 0 };
 
   GM_addStyle(`
   .consolidated-button {
@@ -333,14 +336,10 @@ function animateArrow() {
 }
 
   .script-buttons {
-    display: none;
-    position: fixed;
-    bottom: 5%;
-    right: 1%; /* Mesmo valor que o botão principal */
-    z-index: 9999;
+    position: absolute;
+    z-index: 9998; /* Alterado para manter abaixo do botão principal */
     opacity: 0;
-    transform: translateY(10px) scale(0.8);
-    transition: opacity 0.3s, transform 0.3s;
+    transition: opacity 0.3s;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0.4px 0.4px rgba(255, 255, 255, 0.2); /* Sombra preta e linha branca */
     background-color: #2F2F2F; /* Cor do painel de fundo */
     border-radius: 5px; /* Borda do painel com raio de 5px */
@@ -366,32 +365,79 @@ function animateArrow() {
     text-align: left; /* Alinhamento do texto à esquerda */
 }
 
-.script-buttons.opened button:hover {
-    background-color: #656565; /* Cor de fundo mais clara no hover */
-    transition: background-color 0.1s; /* Inicia a transição mais rapidamente */
+.script-buttons.opened {
+    opacity: 1;
 }
 
 .script-buttons button:hover {
     background-color: #656565; /* Cor de fundo mais clara no hover */
-    transform: none;
-    color: #FFFFFF; /* Cor do texto no hover */
-    box-shadow: none; /* Removendo a sombra no hover */
     transition: background-color 0.1s; /* Inicia a transição mais rapidamente */
 }
 `);
 
-  var mainButton = document.createElement('button');
-  mainButton.innerHTML = '';
   mainButton.className = 'consolidated-button';
-
   document.body.appendChild(mainButton);
+
+    function updateButtonContainerPosition() {
+    if (buttonsContainer && mainButton) {
+      var mainButtonRect = mainButton.getBoundingClientRect();
+      var containerRect = buttonsContainer.getBoundingClientRect();
+
+      // Margem entre o botão principal e os botões secundários
+      var margin = 5;
+
+      // Determina a posição inicial dos botões secundários
+      var initialLeft = mainButtonRect.left + window.scrollX;
+      var initialTop = mainButtonRect.top + window.scrollY + mainButton.offsetHeight + margin;
+
+      // Verifica se os botões secundários cabem na tela acima do botão principal
+      if (initialTop + containerRect.height > window.innerHeight) {
+        initialTop = mainButtonRect.top + window.scrollY - containerRect.height - margin;
+      }
+
+      // Verifica se os botões secundários cabem na tela à direita do botão principal
+      var isAlignedRight = initialLeft + containerRect.width <= window.innerWidth;
+
+      // Define a posição horizontal dos botões secundários
+      var newLeft = isAlignedRight ? initialLeft : mainButtonRect.right - containerRect.width;
+
+      // Atualiza a posição dos botões secundários
+      buttonsContainer.style.left = newLeft + 'px';
+      buttonsContainer.style.top = initialTop + 'px';
+    }
+  }
+
+  mainButton.addEventListener('mousedown', function(event) {
+    isDragging = true;
+    var mainButtonRect = mainButton.getBoundingClientRect();
+    offset = {
+      x: event.clientX - mainButtonRect.left,
+      y: event.clientY - mainButtonRect.top
+    };
+  });
+
+  document.addEventListener('mousemove', function(event) {
+    if (isDragging) {
+      var x = event.clientX - offset.x;
+      var y = event.clientY - offset.y;
+
+      mainButton.style.left = x + 'px';
+      mainButton.style.top = y + 'px';
+
+      updateButtonContainerPosition();
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    isDragging = false;
+  });
 
   mainButton.addEventListener('click', function () {
     if (buttonsContainer) {
       if (mainButton.classList.contains('rotate-left')) {
         mainButton.classList.add('rotate-right');
         buttonsContainer.style.opacity = 0;
-        buttonsContainer.style.transform = 'translateY(10px) scale(0.8)';
+        buttonsContainer.classList.remove('opened');
         setTimeout(function () {
           buttonsContainer.style.display = 'none';
           mainButton.classList.remove('rotate-left', 'rotate-right');
@@ -437,7 +483,6 @@ function animateArrow() {
 
       scriptButton.addEventListener('click', function () {
         buttonsContainer.style.opacity = 0;
-        buttonsContainer.style.transform = 'translateY(10px) scale(0.8)';
         setTimeout(function () {
           buttonsContainer.style.display = 'none';
           buttonsContainer.classList.remove('opened');
@@ -456,8 +501,10 @@ function animateArrow() {
     setTimeout(function () {
       buttonsContainer.classList.add('opened');
       buttonsContainer.style.opacity = 1;
-      buttonsContainer.style.transform = 'translateY(0) scale(1)';
     }, 50);
+
+    // Atualiza a posição dos botões adicionais quando o botão principal é reposicionado
+    updateButtonContainerPosition();
   });
 
   document.addEventListener('click', function (event) {
@@ -469,7 +516,6 @@ function animateArrow() {
       if (mainButton.classList.contains('rotate-left')) {
         mainButton.classList.add('rotate-right');
         buttonsContainer.style.opacity = 0;
-        buttonsContainer.style.transform = 'translateY(10px) scale(0.8)';
         setTimeout(function () {
           buttonsContainer.style.display = 'none';
           buttonsContainer.classList.remove('opened');
@@ -529,7 +575,6 @@ function animateArrow() {
 
     mostrarMensagemPersonalizada();
 })();
-
     // Coloque aqui o código para o botão "Login"
     // Exemplo: console.log("Clicou em Login");
   }
